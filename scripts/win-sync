@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+SOURCE_DIR="$HOME/projects/"
+WIN_USER=$(/mnt/c/Windows/System32/cmd.exe /c "echo %USERNAME%" | tr -d '\r')
+BACKUP_DIR="/mnt/c/Users/$WIN_USER/Documents/WSL_Backup/"
+
+mkdir -p "$BACKUP_DIR"
+
+rsync -avz --delete "$SOURCE_DIR" "$BACKUP_DIR"

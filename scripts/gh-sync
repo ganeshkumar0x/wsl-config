@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -e
+
+ORG_NAME="your-org-name"
+TARGET_DIR="$HOME/projects"
+
+if ! gh auth status >/dev/null 2>&1; then
+    echo "Run 'gh auth login' first."
+    exit 1
+fi
+
+mkdir -p "$TARGET_DIR"
+cd "$TARGET_DIR"
+
+echo "Choose an action for $ORG_NAME:"
+echo "1) Clone all repositories"
+echo "2) Pull all changes (origin main)"
+read -p "Selection (1/2): " choice
+
+if [ "$choice" == "1" ]; then
+    gh repo list "$ORG_NAME" --limit 1000 --json sshUrl --template '{{range .}}{{.sshUrl}}{{"\n"}}{{end}}' | xargs -L1 git clone
+elif [ "$choice" == "2" ]; then
+    for d in */; do
+        if [ -d "$d/.git" ]; then
+            echo "Updating $d..."
+            (cd "$d" && git pull origin main)
+        fi
+    done
+else
+    echo "Invalid selection."
+    exit 1
+fi
