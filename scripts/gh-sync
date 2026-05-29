@@ -3,11 +3,11 @@
 
 set -euo pipefail
 
-ORG_NAME="${1:-${ORG_NAME:-}}"
-TARGET_DIR="${TARGET_DIR:-$HOME/projects}"
+ORG_NAME=""
+TARGET_DIR="$HOME/projects"
 
 if [[ -z "$ORG_NAME" ]]; then
-    echo "usage: gh-sync <org-name>" >&2
+    echo "Set ORG_NAME in this file." >&2
     exit 1
 fi
 

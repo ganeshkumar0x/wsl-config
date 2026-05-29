@@ -3,10 +3,10 @@
 
 set -euo pipefail
 
-SOURCE_DIR="${SOURCE_DIR:-$HOME/projects/}"
+SOURCE_DIR="$HOME/projects/"
 WIN_USER="$(/mnt/c/Windows/System32/cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r')"
-BACKUP_DIR="${BACKUP_DIR:-/mnt/c/Users/$WIN_USER/Documents/WSL_Backup/}"
+BACKUP_DIR="/mnt/c/Users/$WIN_USER/Documents/WSL_Backup/"
 
 mkdir -p "$BACKUP_DIR"
 
-rsync -a --delete "$SOURCE_DIR" "$BACKUP_DIR"
+rsync -av --delete "$SOURCE_DIR" "$BACKUP_DIR"

@@ -58,15 +58,15 @@ cat >> "$ALACRITTY_DIR/alacritty.toml" <<'EOF'
 
 [terminal]
 shell = { program = "wsl.exe", args = ["-d", "Debian", "--cd", "~"] }
+
+[keyboard]
+bindings = [
+    { key = "Key6", mods = "Control", chars = "\u001e" }
+]
 EOF
 
-TMP_DIR="$(mktemp -d)"
-trap 'rm -rf "$TMP_DIR"' EXIT
-
-curl -fsSL "$WSL_RAW/win-sync" -o "$TMP_DIR/win-sync"
-curl -fsSL "$WSL_RAW/gh-sync" -o "$TMP_DIR/gh-sync"
-
-sudo install -m 0755 "$TMP_DIR/win-sync" /usr/local/bin/win-sync
-sudo install -m 0755 "$TMP_DIR/gh-sync" /usr/local/bin/gh-sync
+sudo curl -fsSL "$WSL_RAW/win-sync" -o /usr/local/bin/win-sync
+sudo curl -fsSL "$WSL_RAW/gh-sync" -o /usr/local/bin/gh-sync
+sudo chmod +x /usr/local/bin/win-sync /usr/local/bin/gh-sync
 
 echo "Done. Restart the shell."
