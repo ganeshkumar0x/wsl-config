@@ -1,32 +1,44 @@
 #!/usr/bin/env bash
-set -e
+# gh-sync
 
-ORG_NAME="your-org-name"
-TARGET_DIR="$HOME/projects"
+set -euo pipefail
+
+ORG_NAME="${1:-${ORG_NAME:-}}"
+TARGET_DIR="${TARGET_DIR:-$HOME/projects}"
+
+if [[ -z "$ORG_NAME" ]]; then
+    echo "usage: gh-sync <org-name>" >&2
+    exit 1
+fi
 
 if ! gh auth status >/dev/null 2>&1; then
-    echo "Run 'gh auth login' first."
+    echo "Run 'gh auth login' first." >&2
     exit 1
 fi
 
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 
-echo "Choose an action for $ORG_NAME:"
-echo "1) Clone all repositories"
-echo "2) Pull all changes (origin main)"
-read -p "Selection (1/2): " choice
+printf '1) Clone all repositories\n2) Pull all repositories\n'
+read -r -p "Selection (1/2): " choice
 
-if [ "$choice" == "1" ]; then
-    gh repo list "$ORG_NAME" --limit 1000 --json sshUrl --template '{{range .}}{{.sshUrl}}{{"\n"}}{{end}}' | xargs -L1 git clone
-elif [ "$choice" == "2" ]; then
-    for d in */; do
-        if [ -d "$d/.git" ]; then
-            echo "Updating $d..."
-            (cd "$d" && git pull origin main)
-        fi
-    done
-else
-    echo "Invalid selection."
-    exit 1
-fi
+case "$choice" in
+    1)
+        gh repo list "$ORG_NAME" --limit 1000 --json sshUrl --jq '.[].sshUrl' |
+            while IFS= read -r repo; do
+                git clone "$repo"
+            done
+        ;;
+    2)
+        for dir in */; do
+            if [[ -d "$dir/.git" ]]; then
+                echo "Updating $dir"
+                git -C "$dir" pull --ff-only origin main
+            fi
+        done
+        ;;
+    *)
+        echo "Invalid selection." >&2
+        exit 1
+        ;;
+esac
